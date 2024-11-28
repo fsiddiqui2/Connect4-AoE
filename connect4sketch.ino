@@ -23,6 +23,10 @@ int turn = 0;
 bool boardFull = false;
 bool win = false;
 
+//color of led for players
+int player1RGB[3] = {255, 0, 0};
+int player2RGB[3] = {0, 0, 255};
+
 //arrays to store winning 4-in-a-row
 int winRows[4];
 int winCols[4];
@@ -48,6 +52,7 @@ void loop() {
     
     printGrid();
     turn++;
+    delay(1000);
   }
   else {
     endGame();
@@ -66,16 +71,20 @@ void initializeGrid() {
   printGrid();
 }
 
-//read in a move from the player (via terminal)
+//read in a move from the player (via buttons)
 int getPlayerMove() {
   int move;
-  do {
-    Serial.print("Player ");
-    Serial.print((turn % 2) + 1);
-    Serial.println(", select a column (0-4): ");
-    while (!Serial.available()) {}
-    move = Serial.parseInt();
-  } while (move < 0 || move >= COLS || grid[0][move] != 0);
+  int i = 0;
+  while(true){
+    if(digitalRead(i+8) == HIGH && grid[0][i] == 0){
+      break;
+    }
+    i++;
+    if(i==5){
+      i=0;
+    }
+  }
+  move = i;
   return move;
 }
 
@@ -89,10 +98,10 @@ void makeMove(int player, int move) {
       
       //light up the corresponding led
       if(player==1){
-        led_rows[row].setPixelColor(move, led_rows[row].Color(100, 0, 0));
+        led_rows[row].setPixelColor(move, led_rows[row].Color(player1RGB[0], player1RGB[1], player1RGB[2]));
       }
       else{
-        led_rows[row].setPixelColor(move, led_rows[row].Color(100, 100, 0));
+        led_rows[row].setPixelColor(move, led_rows[row].Color(player2RGB[0], player2RGB[1], player2RGB[2]));
       }
       led_rows[row].show();
       
@@ -215,10 +224,10 @@ void endGame() {
       for (int i = 0; i < 4; i++) {
         //change 4 leds back to red or yellow 
         if((turn % 2) == 1){
-      		led_rows[winRows[i]].setPixelColor(winCols[i], led_rows[winRows[i]].Color(100, 0, 0));
+      		led_rows[winRows[i]].setPixelColor(winCols[i], led_rows[winRows[i]].Color(player1RGB[0], player1RGB[1], player1RGB[2]));
         }
         else{
-          led_rows[winRows[i]].setPixelColor(winCols[i], led_rows[winRows[i]].Color(100, 100, 0));
+          led_rows[winRows[i]].setPixelColor(winCols[i], led_rows[winRows[i]].Color(player2RGB[0], player2RGB[1], player2RGB[2]));
         }
         led_rows[winRows[i]].show();
       }
