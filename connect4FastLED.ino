@@ -1,12 +1,14 @@
 // C++ code
 
 #include <FastLED.h>
-#define NUMPIXELS 23 // number of neopixels per strip
+#define NUMPIXELS 24 // number of neopixels per strip
 #define NUM_ROWS 5
 
 CRGB leds[NUM_ROWS][NUMPIXELS]; // Create a 2D array for LEDs
 
 int limit_switch_pins[5] = {8, 9, 10, 11, 12};
+int player1_win_counter = 0;
+int player2_win_counter = 0;
 
 const int COLS = 5;
 const int ROWS = 5;
@@ -83,7 +85,6 @@ int getPlayerMove() {
       while(true){
         if(digitalRead(13) == HIGH){
           turn++;
-          Serial.println("turn swapped?");
           break;
         }
       }
@@ -214,8 +215,15 @@ void endGame() {
   else {
     Serial.print("Player ");
     Serial.print((turn + 1) % 2 + 1);
+        
+    if (((turn + 1) & 2 + 1) == 1) {
+      player1_win_counter += 1;
+    }
+    else if (((turn + 1) & 2 + 1) == 2) {
+      player2_win_counter += 1;
+    }
     Serial.println(" wins!");
-  
+    
     // Flash winning LEDs 
     for(int repeat = 0; repeat < 20; repeat++){
       for (int i = 0; i < 4; i++) {
